@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import sys
-from DataReader import create_node_feature,edge_read
+from DataReader import create_node_feature, edge_read
 from torch_geometric.data import DataLoader
 import random
 from torch_geometric.data import Data
@@ -12,15 +12,14 @@ random.seed(1)
 batch_size = 64
 
 
-
-def generate_loader(batch_size,datasetPath):
+def generate_loader(batch_size, datasetPath):
     Dataset_test = []
-    Edge,Label_list = edge_read(datasetPath)
+    Edge, Label_list = edge_read(datasetPath)
     Node_Feature = create_node_feature(Edge)
 
-    all_data = list(zip(Edge, Node_Feature,Label_list))
+    all_data = list(zip(Edge, Node_Feature, Label_list))
     random.shuffle(all_data)
-    Edge[:],Node_Feature[:],Label_list[:] = zip(*all_data)
+    Edge[:], Node_Feature[:], Label_list[:] = zip(*all_data)
 
     Edge_test = Edge[:]
 
@@ -32,7 +31,7 @@ def generate_loader(batch_size,datasetPath):
         edge = torch.LongTensor(Edge_test[i])
         node_feature = torch.FloatTensor(Node_Feature_test[i])
         label = torch.LongTensor(Label_list_test[i])
-        data = Data(x=node_feature,edge_index=edge,y=label)
+        data = Data(x=node_feature, edge_index=edge, y=label)
         Dataset_test.append(data)
 
     dataloader = DataLoader(Dataset_test, batch_size=batch_size, shuffle=True)
@@ -40,8 +39,8 @@ def generate_loader(batch_size,datasetPath):
     return dataloader
 
 
-def train(dataloader,loader):
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+def train(dataloader, loader):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     Loss = nn.CrossEntropyLoss().to(device)
     model = Net().to(device)
@@ -50,7 +49,7 @@ def train(dataloader,loader):
     epoch_nums = 100
     best_val_acc = 0
     for epoch in range(epoch_nums):
-        loss_epoch=0
+        loss_epoch = 0
         step = 0
         correct = 0
         for data in dataloader:
@@ -63,13 +62,17 @@ def train(dataloader,loader):
             loss_epoch += loss.item()
             loss.backward()
             optimizer.step()
-            step+=1
+            step += 1
             pred = output.max(1, keepdim=True)[1]
             correct += pred.eq(data.y.view_as(pred)).sum().item()
 
         # loss_epoch += loss
         accuracy = correct / len(dataloader.dataset)
-        print('Train Epoch: {}  Average Loss: {:.6f}  Accuracy:{:.4f}'.format(epoch+1, loss_epoch/len(dataloader),accuracy))
+        print(
+            "Train Epoch: {}  Average Loss: {:.6f}  Accuracy:{:.4f}".format(
+                epoch + 1, loss_epoch / len(dataloader), accuracy
+            )
+        )
 
         correct_val = 0
         with torch.no_grad():
@@ -81,10 +84,10 @@ def train(dataloader,loader):
                 correct_val += pred.eq(data.y.view_as(pred)).sum().item()
 
         accuracy_val = correct_val / len(loader.dataset)
-        print('Val Accuracy: ', accuracy_val)
+        print("Val Accuracy: ", accuracy_val)
 
         if accuracy_val > best_val_acc:
-            torch.save(model.state_dict(), 'model_params.pkl')
+            torch.save(model.state_dict(), "model_params.pkl")
             best_val_acc = accuracy
 
 
@@ -94,6 +97,7 @@ def main():
     trainloader = generate_loader(batch_size, train_dataset_path)
     validloader = generate_loader(batch_size, valid_dataset_path)
     train(trainloader, validloader)
+
 
 if __name__ == "__main__":
     main()
