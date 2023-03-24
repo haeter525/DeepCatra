@@ -9,7 +9,9 @@ class Xi(nn.Module):
         self.s = s  # 状态向量维度
 
         # 线性网络层
-        self.linear = nn.Linear(in_features=2 * ln + 10, out_features=s**2, bias=True)
+        self.linear = nn.Linear(
+            in_features=2 * ln + 10, out_features=s**2, bias=True
+        )
         # 激活函数
         self.tanh = nn.Tanh()
 
@@ -52,9 +54,13 @@ class Hw(nn.Module):
             pass
         else:
             raise TypeError(
-                "==> dg_list should be list or tensor, not {}".format(type(dg_list))
+                "==> dg_list should be list or tensor, not {}".format(
+                    type(dg_list)
+                )
             )
-        A = (self.Xi(X) * self.mu / self.s) / dg_list.view(-1, 1, 1)  # (N, S, S)
+        A = (self.Xi(X) * self.mu / self.s) / dg_list.view(
+            -1, 1, 1
+        )  # (N, S, S)
 
         dest_embeds = neis_embeds.float()
         b = self.Rou(dest_embeds)
@@ -86,7 +92,9 @@ class OriLinearGNN(nn.Module):
         self.stat_dim = stat_dim
         self.T = T
 
-        self.linear1 = nn.Linear(in_features=stat_dim, out_features=1, bias=True)
+        self.linear1 = nn.Linear(
+            in_features=stat_dim, out_features=1, bias=True
+        )
 
         self.sigmoid = nn.Sigmoid()
         self.tanh = nn.Tanh()
@@ -122,7 +130,9 @@ class OriLinearGNN(nn.Module):
         edge_type_embeds = edge_type_embeds.to(device)
         X = torch.cat((node_embeds, neis_embeds, edge_type_embeds), 1)
         X = X.float()
-        H = torch.rand((feat_Matrix.shape[0], self.stat_dim), dtype=torch.float32)
+        H = torch.rand(
+            (feat_Matrix.shape[0], self.stat_dim), dtype=torch.float32
+        )
         H = H.to(feat_Matrix.device)
         # 循环T次计算
         for t in range(self.T):

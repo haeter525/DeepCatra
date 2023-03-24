@@ -21,12 +21,20 @@ class Hybrid_Network(nn.Module):
         self.softmax = nn.Softmax()
 
     def forward(
-        self, feat_Matrix, X_Node, X_Neis, edge_type_index, dg_list, Lstm_feature
+        self,
+        feat_Matrix,
+        X_Node,
+        X_Neis,
+        edge_type_index,
+        dg_list,
+        Lstm_feature,
     ):
         gnn_result = self.gnn_model(
             feat_Matrix, X_Node, X_Neis, edge_type_index, dg_list
         )
         lstm_out = self.lstm(Lstm_feature)
-        network_out = torch.cat([gnn_result.view(-1, 32), lstm_out.view(-1, 32)], 1)
+        network_out = torch.cat(
+            [gnn_result.view(-1, 32), lstm_out.view(-1, 32)], 1
+        )
         final_out = self.softmax(self.linear(network_out))
         return final_out

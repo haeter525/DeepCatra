@@ -58,4 +58,10 @@ def preprocess(graph_vertix, graph_edge):
         node_dest_decrease = np.array([x - 1 for x in node_dest_list[i]])
         dg_list.append(np.array(x_unique[node_dest_decrease]))
 
-    return graph_vertix, node_source_list, node_dest_list, edge_type_index_list, dg_list
+    return (
+        graph_vertix,
+        node_source_list,
+        node_dest_list,
+        edge_type_index_list,
+        dg_list,
+    )

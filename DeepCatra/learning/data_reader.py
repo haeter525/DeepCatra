@@ -93,7 +93,9 @@ def get_data(path, ln, split_length):
 
                 if vande == opcode:
 
-                    single_apk_data = load_my_data_split(opcode_path, split_length)
+                    single_apk_data = load_my_data_split(
+                        opcode_path, split_length
+                    )
                     single_apk_data = np.array(single_apk_data)
                     lstm_feature.append(np.array(single_apk_data))
     num1 = 0

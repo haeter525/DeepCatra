@@ -8,14 +8,21 @@ from hybrid_model import Hybrid_Network
 import datetime
 import sys
 from lstm_preprocess import encoding
-from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
+from sklearn.metrics import (
+    precision_score,
+    recall_score,
+    f1_score,
+    accuracy_score,
+)
 
 opcode_dict = encoding()
 
 
 def get_split_dataset(path, ln, split_length):
 
-    labels, graph_vertix, graph_edge, lstm_feature = get_data(path, ln, split_length)
+    labels, graph_vertix, graph_edge, lstm_feature = get_data(
+        path, ln, split_length
+    )
     (
         graph_vertix,
         node_source_list,
@@ -30,7 +37,9 @@ def get_split_dataset(path, ln, split_length):
     graph_vertix = np.array(graph_vertix, dtype=object)[indices]
     node_source_list = np.array(node_source_list, dtype=object)[indices]
     node_dest_list = np.array(node_dest_list, dtype=object)[indices]
-    edge_type_index_list = np.array(edge_type_index_list, dtype=object)[indices]
+    edge_type_index_list = np.array(edge_type_index_list, dtype=object)[
+        indices
+    ]
     dg_list = np.array(dg_list, dtype=object)[indices]
     lstm_feature = np.array(lstm_feature, dtype=object)[indices]
 
@@ -63,9 +72,11 @@ def batch_iter(
     for i in range(n_batch):
         start_id = i * batch_size
         end_id = min((i + 1) * batch_size, data_len)
-        yield labels[start_id:end_id], lstm_feature[start_id:end_id], graph_vertix[
+        yield labels[start_id:end_id], lstm_feature[
             start_id:end_id
-        ], node_source_list[start_id:end_id], node_dest_list[
+        ], graph_vertix[start_id:end_id], node_source_list[
+            start_id:end_id
+        ], node_dest_list[
             start_id:end_id
         ], edge_type_index_list[
             start_id:end_id
@@ -164,7 +175,10 @@ def train(train, valid_dataset, batch_size):
 
         acc = correct / len(train[0])
         print("epoch %d, acc  %.4f" % (epoch + 1, acc))
-        print("epoch %d, average loss  %.4f" % (epoch + 1, epoch_loss / len(train[6])))
+        print(
+            "epoch %d, average loss  %.4f"
+            % (epoch + 1, epoch_loss / len(train[6]))
+        )
         endTime2 = datetime.datetime.now()
         total_seconds = (endTime2 - startTime2).total_seconds()
         mins = total_seconds / 60
@@ -231,7 +245,9 @@ def valid(test, model_params_path):
 
         test_pred = np.array(test_pred)
         accuracy = accuracy_score(test[6], test_pred)
-        precision = precision_score(test[6], test_pred, average="binary")  # 输出精度
+        precision = precision_score(
+            test[6], test_pred, average="binary"
+        )  # 输出精度
         recall = recall_score(test[6], test_pred, average="binary")  # 输出召回率
         f1 = f1_score(test[6], test_pred, average="binary")
         print("accuracy: ", accuracy)
