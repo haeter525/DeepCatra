@@ -29,7 +29,7 @@ def get_data(path, ln, split_length):
 
     graph_vertix = []
     graph_edge = []
-    # lstm_feature = []
+    lstm_feature = []
     labels = []
 
     i = -1
@@ -96,7 +96,7 @@ def get_data(path, ln, split_length):
                         opcode_path, split_length
                     )
                     single_apk_data = np.array(single_apk_data)
-                    # lstm_feature.append(np.array(single_apk_data))
+                    lstm_feature.append(np.array(single_apk_data))
     num1 = 0
     num0 = 0
     print(f"# of Graph Edge: {len(graph_edge)}")
@@ -109,4 +109,4 @@ def get_data(path, ln, split_length):
             num0 += 1
     print(f" - # of 1 Label: {num1}")
     print(f" - # of 0 Label: {num0}")
-    return labels, graph_vertix, graph_edge
+    return labels, graph_vertix, graph_edge, lstm_feature

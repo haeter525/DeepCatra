@@ -19,7 +19,6 @@ opcode_dict = encoding()
 
 
 def get_split_dataset(path, ln, split_length):
-
     labels, graph_vertix, graph_edge, lstm_feature = get_data(
         path, ln, split_length
     )
@@ -86,7 +85,6 @@ def batch_iter(
 
 
 def train(train, valid_dataset, batch_size):
-
     epoch_num = 25
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -123,7 +121,6 @@ def train(train, valid_dataset, batch_size):
             train[6],
             batch_size,
         ):
-
             torch.cuda.empty_cache()
             full_loss = 0
             labels = torch.from_numpy(labels)
@@ -198,7 +195,6 @@ def valid(test, model_params_path):
     model.load_state_dict(torch.load(model_params_path))
     model.to(device)
     model.eval()
-    test_pred = []
     prob_labels = []
 
     Graph_vertix = test[0]
@@ -207,54 +203,89 @@ def valid(test, model_params_path):
     Edge_type_index_list = test[3]
     Dg_list = test[4]
     Lstm_feature = test[5]
+    labels = test[6]
     with torch.no_grad():
-        for i in range(len(Graph_vertix)):
-            lstm_feature = Lstm_feature[i].astype(int)
-            graph_vertix = Graph_vertix[i].astype(float)
-            node_source_list = Node_source_list[i].astype(int)
-            node_dest_list = Node_dest_list[i].astype(int)
-            edge_type_index_list = Edge_type_index_list[i].astype(int)
-            dg_list = Dg_list[i].astype(int)
+        test_pred = build_model(
+            device,
+            model,
+            prob_labels,
+            Graph_vertix,
+            Node_source_list,
+            Node_dest_list,
+            Edge_type_index_list,
+            Dg_list,
+            Lstm_feature,
+        )
 
-            lstm_feature = torch.LongTensor(lstm_feature)
-            graph_vertix = torch.FloatTensor(graph_vertix)
-            node_source_list = torch.LongTensor(node_source_list)
-            node_dest_list = torch.LongTensor(node_dest_list)
-            edge_type_index_list = torch.LongTensor(edge_type_index_list)
-            dg_list = torch.LongTensor(dg_list)
+        print_matrix(test, test_pred)
+        
+        f1 = f1_score(test[6], test_pred, average="binary")
+    return f1
 
-            lstm_feature = lstm_feature.to(device)
-            graph_vertix = graph_vertix.to(device)
-            node_source_list = node_source_list.to(device)
-            node_dest_list = node_dest_list.to(device)
-            edge_type_index_list = edge_type_index_list.to(device)
-            dg_list = dg_list.to(device)
 
-            out = model(
-                graph_vertix,
-                node_source_list,
-                node_dest_list,
-                edge_type_index_list,
-                dg_list,
-                lstm_feature,
-            )
-            pred = torch.max(out, 1)[1].cpu().numpy()
-            prob_label = out.cpu().numpy()
-            prob_labels.append(prob_label[0][0])
-            test_pred.append(pred[0])
-
-        test_pred = np.array(test_pred)
-        accuracy = accuracy_score(test[6], test_pred)
-        precision = precision_score(
+def print_matrix(test, test_pred):
+    test_pred = np.array(test_pred)
+    accuracy = accuracy_score(test[6], test_pred)
+    precision = precision_score(
             test[6], test_pred, average="binary"
         )  # 输出精度
-        recall = recall_score(test[6], test_pred, average="binary")  # 输出召回率
-        f1 = f1_score(test[6], test_pred, average="binary")
-        print("accuracy: ", accuracy)
-        print("precision: ", precision)
-        print("recall: ", recall)
-        print("f1-score: ", f1)
-    return f1
+    recall = recall_score(test[6], test_pred, average="binary")  # 输出召回率
+    f1 = f1_score(test[6], test_pred, average="binary")
+    print("accuracy: ", accuracy)
+    print("precision: ", precision)
+    print("recall: ", recall)
+    print("f1-score: ", f1)
+
+
+def build_model(
+    device,
+    model,
+    prob_labels,
+    Graph_vertix,
+    Node_source_list,
+    Node_dest_list,
+    Edge_type_index_list,
+    Dg_list,
+    Lstm_feature,
+):
+    test_pred = []
+
+    for i in range(len(Graph_vertix)):
+        lstm_feature = Lstm_feature[i].astype(int)
+        graph_vertix = Graph_vertix[i].astype(float)
+        node_source_list = Node_source_list[i].astype(int)
+        node_dest_list = Node_dest_list[i].astype(int)
+        edge_type_index_list = Edge_type_index_list[i].astype(int)
+        dg_list = Dg_list[i].astype(int)
+
+        lstm_feature = torch.LongTensor(lstm_feature)
+        graph_vertix = torch.FloatTensor(graph_vertix)
+        node_source_list = torch.LongTensor(node_source_list)
+        node_dest_list = torch.LongTensor(node_dest_list)
+        edge_type_index_list = torch.LongTensor(edge_type_index_list)
+        dg_list = torch.LongTensor(dg_list)
+
+        lstm_feature = lstm_feature.to(device)
+        graph_vertix = graph_vertix.to(device)
+        node_source_list = node_source_list.to(device)
+        node_dest_list = node_dest_list.to(device)
+        edge_type_index_list = edge_type_index_list.to(device)
+        dg_list = dg_list.to(device)
+
+        out = model(
+            graph_vertix,
+            node_source_list,
+            node_dest_list,
+            edge_type_index_list,
+            dg_list,
+            lstm_feature,
+        )
+        pred = torch.max(out, 1)[1].cpu().numpy()
+        prob_label = out.cpu().numpy()
+        prob_labels.append(prob_label[0][0])
+        test_pred.append(pred[0])
+
+        return test_pred
 
 
 def main():
