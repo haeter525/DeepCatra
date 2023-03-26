@@ -2,7 +2,7 @@ import numpy as np
 from collections import defaultdict
 
 
-def preprocess(graph_vertix, graph_edge):
+def preprocess(graph_vertex, graph_edge):
     for i in range(len(graph_edge)):
         graph_edge[i] = np.unique(graph_edge[i], axis=0)
 
@@ -59,7 +59,7 @@ def preprocess(graph_vertix, graph_edge):
         dg_list.append(np.array(x_unique[node_dest_decrease]))
 
     return (
-        graph_vertix,
+        graph_vertex,
         node_source_list,
         node_dest_list,
         edge_type_index_list,

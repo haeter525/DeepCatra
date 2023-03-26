@@ -1,19 +1,17 @@
 import os
 import numpy as np
-from lstm_preprocess import encoding, split_opcode_seq
+from DeepCatra.learning.lstm_preprocess import encoding, split_opcode_seq
 
 
 def load_my_data_split(deal_folder, split_length):
-
     opcode_dict = encoding()
     feature_data = []
     with open(deal_folder, "r", encoding="utf-8") as file:
-
         opcode_seq = []
         for line in file.readlines():
             line = line.strip("\n")
             if line == "" and len(opcode_seq) != 0:
-                feature_data.extend(split_opcode_seq(opcode_seq))
+                feature_data.extend(split_opcode_seq(opcode_seq, split_length))
                 opcode_seq = []
             elif line.find(":") == -1 and line != "":
                 opcode_seq.append(np.int32(opcode_dict[line]))
@@ -24,7 +22,6 @@ def load_my_data_split(deal_folder, split_length):
 
 
 def get_data(path, ln, split_length):
-
     path_benign = os.path.join(path, "benign")
     path_malicious = os.path.join(path, "malware")
     hash_list = os.listdir(path_malicious) + os.listdir(path_benign)
@@ -32,11 +29,14 @@ def get_data(path, ln, split_length):
 
     graph_vertix = []
     graph_edge = []
-    lstm_feature = []
+    # lstm_feature = []
     labels = []
 
     i = -1
     for files in dir:  # 遍历文件夹
+        if files not in ["benign", "malware"]:
+            continue
+
         sub_path = os.path.join(path, files)
         file = os.listdir(sub_path)
         i = i + 1
@@ -92,23 +92,21 @@ def get_data(path, ln, split_length):
                     graph_vertix.append(vertix)
 
                 if vande == opcode:
-
                     single_apk_data = load_my_data_split(
                         opcode_path, split_length
                     )
                     single_apk_data = np.array(single_apk_data)
-                    lstm_feature.append(np.array(single_apk_data))
+                    # lstm_feature.append(np.array(single_apk_data))
     num1 = 0
     num0 = 0
-    print(len(graph_edge))
-    print(len(graph_vertix))
-    print(len(labels))
-    print(len(lstm_feature))
+    print(f"# of Graph Edge: {len(graph_edge)}")
+    print(f"# of Graph Node: {len(graph_vertix)}")
+    print(f"# of Label: {len(labels)}")
     for x in labels:
         if x == 1:
             num1 += 1
         if x == 0:
             num0 += 1
-    print(num1)
-    print(num0)
-    return labels, graph_vertix, graph_edge, lstm_feature
+    print(f" - # of 1 Label: {num1}")
+    print(f" - # of 0 Label: {num0}")
+    return labels, graph_vertix, graph_edge

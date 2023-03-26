@@ -6,6 +6,7 @@ class Xi(nn.Module):
     def __init__(self, ln, s):
         super(Xi, self).__init__()
         self.ln = ln  # 节点特征向量的维度
+        # self.le = le  # 边特征向量的维度
         self.s = s  # 状态向量维度
 
         # 线性网络层

@@ -2,12 +2,12 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
-from data_reader import get_data
-from gnn_preprocess import preprocess
-from hybrid_model import Hybrid_Network
+from DeepCatra.learning.data_reader import get_data
+from DeepCatra.learning.gnn_preprocess import preprocess
+from DeepCatra.learning.hybrid_model import Hybrid_Network
 import datetime
 import sys
-from lstm_preprocess import encoding
+from DeepCatra.learning.lstm_preprocess import encoding
 from sklearn.metrics import (
     precision_score,
     recall_score,

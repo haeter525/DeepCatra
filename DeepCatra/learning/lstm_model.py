@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from lstm_preprocess import encoding
+from DeepCatra.learning.lstm_preprocess import encoding
 
 opcode_dict = encoding()
 

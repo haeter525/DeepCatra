@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
-from lstm_model import LSTM_net
-from gnn_model import OriLinearGNN
+from DeepCatra.learning.lstm_model import LSTM_net
+from DeepCatra.learning.gnn_model import OriLinearGNN
 
 
 class Hybrid_Network(nn.Module):

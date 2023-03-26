@@ -3,7 +3,9 @@ import numpy as np
 
 def encoding():
     opcode_dict = {}
-    with open("opcodes_encoding.txt", "r", encoding="utf-8") as file:
+    with open(
+        "DeepCatra/learning/opcodes_encoding.txt", "r", encoding="utf-8"
+    ) as file:
         for line in file.readlines():
             line = line.strip("\n")
             if line != "":
@@ -13,7 +15,7 @@ def encoding():
     return opcode_dict
 
 
-def split_opcode_seq(opcode_seq):
+def split_opcode_seq(opcode_seq, split_n):
     opcode_seq_list = []
     num = int(len(opcode_seq) / split_n)
     for i in range(0, num):
